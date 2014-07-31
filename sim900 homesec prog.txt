@@ -1,0 +1,67 @@
+#include "SIM900.h"
+#include <SoftwareSerial.h>
+#include "sms.h"
+SMSGSM sms;
+boolean started=false;
+int temp=0;
+int ir=4;
+int hall=7;
+int buzzer =13;
+void setup() 
+{
+  pinMode(buzzer,OUTPUT);
+  pinMode(ir,INPUT);
+  pinMode(hall,INPUT);
+  //Serial connection.
+  Serial.begin(9600);
+  Serial.println("GSM Shield testing.");
+
+  if (gsm.begin(2400)){
+    Serial.println("\nstatus=READY");
+    started=true;  
+  }
+  else Serial.println("\nstatus=IDLE");
+   pinMode(buzzer,OUTPUT);
+  if(started){
+    if (sms.SendSMS("+917200206125", "system is ready!"))
+      Serial.println("\nSMS sent OK");
+  }
+
+};
+
+
+void loop() 
+{
+  delay(2000);
+int x,y,z,t;
+   x=analogRead(temp);
+  y=digitalRead(ir);
+  z=digitalRead(hall);
+  t=x*0.48828125;
+  Serial.print(t);
+  Serial.println("C");
+  delay(1000);
+  if(t>40)
+  {
+   digitalWrite(buzzer,HIGH);
+   sms.SendSMS("+917200206125", "fire-fire");
+   Serial.println("\nSMS sent OK");
+  }
+  else if(z==0)
+  {
+    digitalWrite(buzzer,HIGH);
+    sms.SendSMS("+917200206125", "someone's intruding!");
+  }
+  else if(y!=0)
+    {
+      delay(3000);
+      if(y!=0)
+      {
+        
+        digitalWrite(buzzer,HIGH);
+        sms.SendSMS("+917200206125", "someone's there in the house!");
+      }
+  else
+   digitalWrite(buzzer,LOW);
+}
+}

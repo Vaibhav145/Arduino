@@ -1,0 +1,119 @@
+int tsend=1;
+int count=0;
+int count1=0;
+char phone_no[]="7200206125";
+int buzzer =13;
+char n='1';
+int temp=0;
+int ir=4;
+int hall=7;
+char inchar; 
+void setup()
+{
+  pinMode(buzzer,OUTPUT);
+  pinMode(ir,INPUT);
+  pinMode(hall,INPUT);
+  Serial.begin(9600); delay(2000);
+  Serial.println("AT+CMGF=1"); delay(200);
+  Serial.println("AT+CMGF=1\r"); delay(200);
+   Serial.println("AT+CSMS=1\r"); delay(200);
+   Serial.println("AT+CNMI=2,2,0,0,0");delay(200);
+  }
+void sendSMS()
+{
+  while(count<=tsend)
+  {
+    if(count==tsend)
+          {
+            digitalWrite(buzzer,HIGH);
+            delay(5000);
+          }
+           else
+          {
+            delay(1500);
+            Serial.print("AT+CMGS=\"");
+            Serial.print(phone_no);
+            Serial.println("\"");
+              while(Serial.read()!='>');
+              {
+                switch(n){
+                  case '1':
+               {
+                 Serial.print("someone's intruding into the house!!");
+              }
+              case '2':
+              {
+                Serial.print("someone's is there in house!!");
+              }
+                }
+                delay(500);
+                Serial.write(0x1A);
+                Serial.write(0x0D);
+                Serial.write(0x0A);
+                delay(5000);
+              }
+             count++;
+          }}}
+void sendSMS1()
+{
+  while(count1<=(tsend+1))
+  {
+            if(count1==tsend)
+          {
+            digitalWrite(buzzer,HIGH);
+            delay(5000);
+          }
+           else
+          {
+            delay(1500);
+            Serial.print("AT+CMGS=\"");
+            Serial.print(phone_no);
+            Serial.println("\"");
+              while(Serial.read()!='>');
+              {
+                
+                Serial.print("Fire-Fire!!");
+                delay(500);
+                Serial.write(0x1A);
+                Serial.write(0x0D);
+                Serial.write(0x0A);
+                delay(5000);
+              }count1++;
+          }}}
+void loop()
+{
+  int x,y,z,t;
+   x=analogRead(temp);
+  y=digitalRead(ir);
+  z=digitalRead(hall);
+  t=x*0.48828125;
+  Serial.print(t);
+  Serial.println("C");
+  delay(1000);
+  if(z==0)
+  {
+    digitalWrite(buzzer,HIGH);
+    n='1';
+    sendSMS();}
+  else if(y!=0)
+    {
+      delay(3000);
+      if(y!=0)
+      {
+        digitalWrite(buzzer,HIGH);
+        n='2';
+        sendSMS();
+      }
+      else
+      digitalWrite(buzzer,LOW);
+    }
+   else if(t>22)
+      {
+        digitalWrite(buzzer,HIGH);
+        //n='2';
+        sendSMS1();
+      }
+   else
+   digitalWrite(buzzer,LOW);
+}
+  
